@@ -29,7 +29,7 @@ class CarliniWagnerL2Attack(Attack):
     def __call__(self, input_or_adv, label=None, unpack=True,
                  binary_search_steps=5, max_iterations=1000,
                  confidence=0, learning_rate=5e-3,
-                 initial_const=1e-2, abort_early=True):
+                 initial_const=1e-2, abort_early=True, svaeMedianImages="./mediate_images/"):
 
         """The L2 version of the Carlini & Wagner attack.
 
@@ -68,6 +68,7 @@ class CarliniWagnerL2Attack(Attack):
             for some time (a tenth of max_iterations).
 
         """
+
 
         a = input_or_adv
         del input_or_adv
@@ -123,8 +124,11 @@ class CarliniWagnerL2Attack(Attack):
         const = initial_const
         lower_bound = 0
         upper_bound = np.inf
-
+        import os
         for binary_search_step in range(binary_search_steps):
+            if not os.path.isdir(svaeMedianImages + "%d/" % binary_search_step):
+                os.mkdir(svaeMedianImages + "%d/" % binary_search_step)
+            curpath = svaeMedianImages + "%d/" % binary_search_step
             if binary_search_step == binary_search_steps - 1 and \
                     binary_search_steps >= 10:
                 # in the last binary search step, use the upper_bound instead
@@ -141,14 +145,17 @@ class CarliniWagnerL2Attack(Attack):
             found_adv = False  # found adv with the current const
             loss_at_previous_check = np.inf
 
+            intermedaiteimgs = []
+            bb = False
             for iteration in range(max_iterations):
                 x, dxdp = to_model_space(att_original + att_perturbation)
-                logits, is_adv = a.forward_one(x)
+                logits, is_adv, is_best, _ = a.forward_one(x,return_details=True)
                 loss, dldx = self.loss_function(
                     const, a, x, logits, reconstructed_original,
                     confidence, min_, max_)
 
                 logging.info('loss: {}; best overall distance: {}'.format(loss, a.distance))
+                #im = Image.fromarray(x.astype('uint8'))
 
                 # backprop the gradient of the loss w.r.t. x further
                 # to get the gradient of the loss w.r.t. att_perturbation
@@ -166,7 +173,15 @@ class CarliniWagnerL2Attack(Attack):
                     # this binary search step can be considered a success
                     # but optimization continues to minimize perturbation size
                     found_adv = True
+                if iteration%100==0 or is_adv:
+                    intermedaiteimgs.append(x)
+                if len(intermedaiteimgs) == 200 or is_adv:
+                    np.save(curpath + "%d" % iteration, np.asarray(intermedaiteimgs))
+                    intermedaiteimgs = []
 
+                if is_best:
+                    np.save(curpath + "%d_best" % iteration, np.asarray([iteration]))
+                    bb=True
                 if abort_early and \
                         iteration % (np.ceil(max_iterations / 10)) == 0:
                     # after each tenth of the iterations, check progress
@@ -177,10 +192,25 @@ class CarliniWagnerL2Attack(Attack):
             if found_adv:
                 logging.info('found adversarial with const = {}'.format(const))
                 upper_bound = const
+                np.save(curpath + "found", x)
             else:
                 logging.info('failed to find adversarial '
                              'with const = {}'.format(const))
                 lower_bound = const
+
+            if not bb:
+                import os
+                import glob
+                import stat
+                files = glob.glob(svaeMedianImages+"**.npy")
+                for f in files:
+                    try:
+                        os.remove(f)
+                    except PermissionError:
+                        print('PermissionError do change')
+                        os.chmod(f, stat.S_IRUSR|stat.S_IRGRP|stat.S_IROTH|stat.S_IXUSR|stat.S_IRUSR|stat.S_IWUSR|stat.S_IWGRP|stat.S_IXGRP)
+                        os.remove(f)
+                    ##os.remove(f)
 
             if upper_bound == np.inf:
                 # exponential search
