@@ -192,7 +192,7 @@ class CarliniWagnerL2Attack(Attack):
             if found_adv:
                 logging.info('found adversarial with const = {}'.format(const))
                 upper_bound = const
-                np.save(curpath + "found", x)
+                #np.save(curpath + "found", x)
             else:
                 logging.info('failed to find adversarial '
                              'with const = {}'.format(const))
