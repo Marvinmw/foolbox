@@ -173,14 +173,14 @@ class CarliniWagnerL2Attack(Attack):
                     # this binary search step can be considered a success
                     # but optimization continues to minimize perturbation size
                     found_adv = True
-                if iteration%100==0 or is_adv:
+                if iteration%2==0:
                     intermedaiteimgs.append(x)
-                if len(intermedaiteimgs) == 200 or is_adv:
+                if len(intermedaiteimgs) == 200 or (is_best and is_adv):
                     np.save(curpath + "%d" % iteration, np.asarray(intermedaiteimgs))
                     intermedaiteimgs = []
 
                 if is_best:
-                    np.save(curpath + "%d_best" % iteration, np.asarray([iteration]))
+                    np.save(curpath + "best", {'itr':np.asarray([iteration]), 'img':x})
                     bb=True
                 if abort_early and \
                         iteration % (np.ceil(max_iterations / 10)) == 0:
@@ -202,7 +202,7 @@ class CarliniWagnerL2Attack(Attack):
                 import os
                 import glob
                 import stat
-                files = glob.glob(svaeMedianImages+"**.npy")
+                files = glob.glob(curpath+"**.npy")
                 for f in files:
                     try:
                         os.remove(f)

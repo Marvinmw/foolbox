@@ -73,14 +73,18 @@ if __name__ == '__main__':
 
     del x_train
     y_test = np.argmax(y_test, axis=1)
-    if not os.path.isfile('./adv_data/slectedTest200ImgsIdx'):
-            idx = np.arange(x_test.shape[0])
+    if not os.path.isfile('./adv_data/slectedTest300ImgsIdx_%s_%s'%(name, dataname)):
+            y = model.predict(x_test)
+            plabels = np.argmax(y, axis=1)
+            b = plabels == y_test
+            #idx = np.arange(x_test.shape[0])
+            idx = np.nonzero(b)[0]
             np.random.shuffle(idx)
-            cx_train, cy_train, selectedIndex = x_test[idx[:200]], y_test[idx[:200]], idx[:200]
+            cx_train, cy_train, selectedIndex = x_test[idx[:300]], y_test[idx[:300]], idx[:300]
             cidx = selectedIndex
-            np.save('./adv_data/slectedTest200ImgsIdx', {"idx":selectedIndex})
+            np.save('./adv_data/slectedTest300ImgsIdx_%s_%s'%(name, dataname), {"idx":selectedIndex})
     else:
-            data = np.load('./adv_data/slectedTest200ImgsIdx').item()
+            data = np.load('./adv_data/slectedTest300ImgsIdx_%s_%s'%(name, dataname)).item()
             selectedIndex = data.get("idx")
             (_, _), (x_test, y_test), (_, _, num_class) = datama.getData(dataname)
             y_test = np.argmax(y_test, axis=1)[..., np.newaxis]

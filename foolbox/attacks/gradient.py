@@ -30,24 +30,40 @@ class SingleStepGradientBaseAttack(Attack):
         else:
             decrease_if_first = False
 
+
         for _ in range(2):  # to repeat with decreased epsilons if necessary
             intermedaiteimgs = []
+            isadv = False
             for i, epsilon in enumerate(epsilons):
                 perturbed = x + gradient * epsilon
                 perturbed = np.clip(perturbed, min_, max_)
 
                 _, is_adversarial = a.forward_one(perturbed)
-                if i%10==0 or is_adversarial:
+                isadv = is_adversarial
+                if i % 2 == 0:
                     intermedaiteimgs.append(perturbed)
                 if len(intermedaiteimgs) == 50 or is_adversarial:
                     np.save(svaeMedianImages + "%d" % i, np.asarray(intermedaiteimgs))
                     intermedaiteimgs = []
                 if is_adversarial:
-                    np.save(svaeMedianImages + "found", perturbed)
+                    np.save(svaeMedianImages + "found", {'img':perturbed, 'itr':i})
                     if decrease_if_first and i < 20:
                         logging.info('repeating attack with smaller epsilons')
                         break
                     return
+
+            if not isadv:
+                import os
+                import glob
+                import stat
+                files = glob.glob(svaeMedianImages+"**.npy")
+                for f in files:
+                        try:
+                            os.remove(f)
+                        except PermissionError:
+                            print('PermissionError do change')
+                            os.chmod(f, stat.S_IRUSR|stat.S_IRGRP|stat.S_IROTH|stat.S_IXUSR|stat.S_IRUSR|stat.S_IWUSR|stat.S_IWGRP|stat.S_IXGRP)
+                            os.remove(f)
 
             max_epsilon = epsilons[i]
             epsilons = np.linspace(0, max_epsilon, num=20 + 1)[1:]
