@@ -20,14 +20,21 @@ def summaryCW(modellist =['mlp','lenet','deepxplore'], datalist = ['mnist','fash
                                            files = os.listdir(path)
                                            if 'best.npy' in files:
                                                files.remove('best.npy')
+                                               finalimg = np.load(os.path.join(path, 'best.npy')).item()
+                                               itr = finalimg.get('itr')
                                                sf = natsort.natsorted(files)
                                                total_images = []
                                                for f in sf:
+                                                   name = int(f.split('.')[0])
                                                    fpath = os.path.join(path, f)
                                                    images  = np.load(fpath)
-                                                   #print(images.shape)
-                                                   total_images.extend(list(images))
-                                               finalimg = np.load(os.path.join(path, 'best.npy')).item()
+                                                   if itr > name:
+                                                       # print(images.shape)
+                                                       total_images.extend(list(images))
+                                                   else:
+                                                       total_images.extend(list(images))
+                                                       break
+
                                                total_images.append(finalimg.get('img'))
                                                np.save(svaedpath, total_images)
                                                break
@@ -56,14 +63,20 @@ def summaryFGSM(modellist =['mlp','lenet','deepxplore'], datalist = ['mnist','fa
                                            files = os.listdir(path)
                                            if 'found.npy' in files:
                                                files.remove('found.npy')
+                                               finalimg = np.load(os.path.join(path, 'found.npy')).item()
+                                               itr = finalimg.get('itr')
                                                sf = natsort.natsorted(files)
                                                total_images = []
                                                for f in sf:
-                                                   fpath = os.path.join(path, f)
-                                                   images  = np.load(fpath)
-                                                   #print(images.shape)
-                                                   total_images.extend(list(images))
-                                               finalimg = np.load(os.path.join(path, 'found.npy')).item()
+                                                    name = int(f.split('.')[0])
+                                                    fpath = os.path.join(path, f)
+                                                    images  = np.load(fpath)
+                                                    if itr>name:
+                                                        #print(images.shape)
+                                                        total_images.extend(list(images))
+                                                    else:
+                                                        total_images.extend(list(images))
+                                                        break
                                                total_images.append(finalimg.get('img'))
                                                np.save(svaedpath, total_images)
 
@@ -71,9 +84,9 @@ def summaryFGSM(modellist =['mlp','lenet','deepxplore'], datalist = ['mnist','fa
 
                     dowork()
 if __name__ == '__main__':
-    #summaryCW(modellist=['lenet', 'deepxplore'], datalist=['mnist', 'fashion_mnist'])
-    #summaryCW(modellist=['vgg'], datalist=['cifar10'])
-    #summaryCW(modellist=['netinnet'], datalist=['cifar10'])
+    summaryCW(modellist=['lenet', 'deepxplore'], datalist=['mnist', 'fashion_mnist'])
+    summaryCW(modellist=['vgg'], datalist=['cifar10'])
+    summaryCW(modellist=['netinnet'], datalist=['cifar10'])
 
     summaryFGSM(modellist=['lenet', 'deepxplore'], datalist=['mnist', 'fashion_mnist'])
     summaryFGSM(modellist=['vgg'], datalist=['cifar10'])
