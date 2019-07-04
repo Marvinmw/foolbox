@@ -1,6 +1,7 @@
 import numpy as np
 import natsort
 import os
+from tqdm import tqdm
 def summaryCW(modellist =['mlp','lenet','deepxplore'], datalist = ['mnist','fashion_mnist']):
     #modellist =['mlp','lenet','deepxplore', 'netinnet','vgg']
     #datalist = ['mnist','fashion_mnist']
@@ -8,7 +9,7 @@ def summaryCW(modellist =['mlp','lenet','deepxplore'], datalist = ['mnist','fash
         for d in datalist:
             if not os.path.isdir('m_CW_%s_%s'%(m,d)):
                 os.mkdir('m_CW_%s_%s'%(m,d))
-            for j in np.arange(300):
+            for j in tqdm(np.arange(300)):
                 def dowork():
                     for i in np.arange(5)[::-1]:
                         path = "CW_%s_%s/%d/%d"%(m,d,j,i)
