@@ -24,17 +24,18 @@ def summaryCW(modellist =['mlp','lenet','deepxplore'], datalist = ['mnist','fash
                                                itr = finalimg.get('itr')
                                                sf = natsort.natsorted(files)
                                                total_images = []
-                                               for f in sf:
-                                                   name = int(f.split('.')[0])
-                                                   fpath = os.path.join(path, f)
-                                                   images  = np.load(fpath)
-                                                   if itr > name:
-                                                       # print(images.shape)
-                                                       total_images.extend(list(images))
-                                                   else:
-                                                       total_images.extend(list(images))
-                                                       break
-
+                                               def dow():
+                                                   for f in sf:
+                                                       name = int(f.split('.')[0])
+                                                       fpath = os.path.join(path, f)
+                                                       images  = np.load(fpath)
+                                                       if itr > name:
+                                                           # print(images.shape)
+                                                           total_images.extend(list(images))
+                                                       else:
+                                                           total_images.extend(list(images))
+                                                           break
+                                               dow()
                                                total_images.append(finalimg.get('img'))
                                                np.save(svaedpath, total_images)
                                                break
