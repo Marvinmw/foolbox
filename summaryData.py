@@ -23,8 +23,9 @@ def summaryCW(modellist =['mlp','lenet','deepxplore'], datalist = ['mnist','fash
                                            total_images = []
                                            for f in sf:
                                                fpath = os.path.join(path, f)
-                                               images  = np.load(fpath).item()
-                                               total_images.extend(images)
+                                               images  = np.load(fpath)
+                                               print(images.shape)
+                                               total_images.extend(list(images))
                                                np.save(svaedpath, total_images)
                                            break
                                        else:
