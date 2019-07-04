@@ -27,7 +27,7 @@ def summaryCW(modellist =['mlp','lenet','deepxplore'], datalist = ['mnist','fash
                                                    images  = np.load(fpath)
                                                    #print(images.shape)
                                                    total_images.extend(list(images))
-                                               finalimg = np.load(os.path.join(path, 'best.npy')).items()
+                                               finalimg = np.load(os.path.join(path, 'best.npy'))
                                                total_images.append(finalimg.get('img'))
                                                np.save(svaedpath, total_images)
                                                break
@@ -63,7 +63,7 @@ def summaryFGSM(modellist =['mlp','lenet','deepxplore'], datalist = ['mnist','fa
                                                    images  = np.load(fpath)
                                                    #print(images.shape)
                                                    total_images.extend(list(images))
-                                               finalimg = np.load(os.path.join(path, 'found.npy')).items()
+                                               finalimg = np.load(os.path.join(path, 'found.npy'))
                                                total_images.append(finalimg.get('img'))
                                                np.save(svaedpath, total_images)
 
