@@ -49,7 +49,7 @@ def summaryFGSM(modellist =['mlp','lenet','deepxplore'], datalist = ['mnist','fa
                     os.mkdir('m_%s_%s_%s'%(a,m,d))
                 for j in tqdm(np.arange(300)):
                     def dowork():
-                            path = "%s_%s_%s/%d/%d"%(a, m,d,j)
+                            path = "%s_%s_%s/%d"%(a, m,d,j)
                             svaedpath = "m_%s_%s_%s/%d.npy" % (a,m, d, j)
                             if os.path.isdir(path):
                                     if len(os.listdir(path))!=0:
@@ -71,9 +71,9 @@ def summaryFGSM(modellist =['mlp','lenet','deepxplore'], datalist = ['mnist','fa
 
                     dowork()
 if __name__ == '__main__':
-    summaryCW(modellist=['lenet', 'deepxplore'], datalist=['mnist', 'fashion_mnist'])
-    summaryCW(modellist=['vgg'], datalist=['cifar10'])
-    summaryCW(modellist=['netinnet'], datalist=['cifar10'])
+    #summaryCW(modellist=['lenet', 'deepxplore'], datalist=['mnist', 'fashion_mnist'])
+    #summaryCW(modellist=['vgg'], datalist=['cifar10'])
+    #summaryCW(modellist=['netinnet'], datalist=['cifar10'])
 
     summaryFGSM(modellist=['lenet', 'deepxplore'], datalist=['mnist', 'fashion_mnist'])
     summaryFGSM(modellist=['vgg'], datalist=['cifar10'])
