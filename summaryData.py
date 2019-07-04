@@ -9,7 +9,6 @@ def summaryCW(modellist =['mlp','lenet','deepxplore'], datalist = ['mnist','fash
             if not os.path.isdir('m_CW_%s_%s'%(m,d)):
                 os.mkdir('m_CW_%s_%s'%(m,d))
             for j in np.arange(300):
-
                 def dowork():
                     for i in np.arange(5)[::-1]:
                         path = "CW_%s_%s/%d/%d"%(m,d,j,i)
@@ -24,9 +23,9 @@ def summaryCW(modellist =['mlp','lenet','deepxplore'], datalist = ['mnist','fash
                                            for f in sf:
                                                fpath = os.path.join(path, f)
                                                images  = np.load(fpath)
-                                               print(images.shape)
+                                               #print(images.shape)
                                                total_images.extend(list(images))
-                                               np.save(svaedpath, total_images)
+                                           np.save(svaedpath, total_images)
                                            break
                                        else:
                                            continue
@@ -38,5 +37,5 @@ def summaryCW(modellist =['mlp','lenet','deepxplore'], datalist = ['mnist','fash
 
 
 if __name__ == '__main__':
-    summaryCW(modellist=['mlp', 'lenet', 'deepxplore'], datalist=['mnist', 'fashion_mnist'])
+    summaryCW(modellist=['lenet', 'deepxplore'], datalist=['mnist', 'fashion_mnist'])
     summaryCW(modellist=['vgg'], datalist=['cifar10'])
