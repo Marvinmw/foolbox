@@ -65,6 +65,9 @@ if __name__ == '__main__':
     name = args['model']
 
     (x_train, _), (x_test, y_test), (_, _, num_class) = datama.getData(dataname)
+    if name == 'mlp':
+        x_train = x_train.reshape(x_train.shape[0], -1)
+        x_test = x_test.reshape(x_test.shape[0], -1)
     bestModelName = path + weightspaths[name]
     if name == 'mlp':
         x_train = x_train.reshape(x_train.shape[0], -1)
@@ -91,8 +94,7 @@ if __name__ == '__main__':
             cx_train, cy_train, cidx = x_test[selectedIndex], y_test[selectedIndex], selectedIndex
 
 
-    if name == 'mlp':
-        cx_train = cx_train.reshape(cx_train.shape[0], -1)
+
 
     if "FGSM" in attack_methods:
          print("FGSM Attacking")
