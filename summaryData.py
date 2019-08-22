@@ -36,7 +36,7 @@ def summaryCW(modellist =['mlp','lenet','deepxplore'], datalist = ['mnist','fash
             model = helper.load_model(m, bestModelName, x_train.shape[1:], 10, isDrop=False)
 
 
-            data = np.load('./adv_data/slectedTest300ImgsIdx_%s_%s' % (m, d)).item()
+            data = np.load('./adv_data/slectedTest300ImgsIdx_%s_%s.npy' % (m, d)).item()
             selectedIndex = data.get("idx")
             ly_test = np.argmax(y_test, axis=1)[..., np.newaxis]
             cx_train, cy_train, cidx = x_test[selectedIndex], ly_test[selectedIndex], selectedIndex
