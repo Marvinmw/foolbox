@@ -5,7 +5,7 @@ import utils.tools as helper
 import utils.load_data as datama
 from tqdm import tqdm
 import pandas as pd
-def summaryCW(modellist =['mlp','lenet','deepxplore'], datalist = ['mnist','fashion_mnist'], adv=['CW']):
+def summaryCW(cfilename, modellist =['mlp','lenet','deepxplore'], datalist = ['mnist','fashion_mnist'], adv=['CW']):
     #modellist =['mlp','lenet','deepxplore', 'netinnet','vgg']
     #datalist = ['mnist','fashion_mnist']
     wpath = './cluster_results/model/'
@@ -30,9 +30,7 @@ def summaryCW(modellist =['mlp','lenet','deepxplore'], datalist = ['mnist','fash
             if m == 'mlp':
                 x_train = x_train.reshape(x_train.shape[0], -1)
                 x_test = x_test.reshape(x_test.shape[0], -1)
-            bestModelName = wpath + weightspaths[m]
-            if m == 'mlp':
-                x_train = x_train.reshape(x_train.shape[0], -1)
+
             model = helper.load_model(m, bestModelName, x_train.shape[1:], 10, isDrop=False)
 
 
@@ -40,7 +38,7 @@ def summaryCW(modellist =['mlp','lenet','deepxplore'], datalist = ['mnist','fash
             selectedIndex = data.get("idx")
             ly_test = np.argmax(y_test, axis=1)[..., np.newaxis]
             cx_train, cy_train, cidx = x_test[selectedIndex], ly_test[selectedIndex], selectedIndex
-
+            cy_train = np.squeeze(cy_train)
             for a in adv:
                 if not os.path.isdir('m_%s_%s_%s'%(a, m,d)):
                     os.mkdir('m_%s_%s_%s'%(a,m,d))
@@ -56,23 +54,26 @@ def summaryCW(modellist =['mlp','lenet','deepxplore'], datalist = ['mnist','fash
                                     if len(os.listdir(path))!=0:
                                            files = os.listdir(path)
                                            if 'best.npy' in files:
-                                               #files.remove('best.npy')
+                                               files.remove('best.npy')
                                                finalimg = np.load(os.path.join(path, 'best.npy')).item()
                                                itr = finalimg.get('itr')
                                                sf = natsort.natsorted(files)
                                                total_images = []
                                                def dow():
-                                                   n = 0
-                                                   c = 0
-                                                   for f in sf:
+                                                    n = 0
+                                                    c = 0
+                                                    for f in sf:
                                                        name = int(f.split('.')[0])
                                                        fpath = os.path.join(path, f)
                                                        images  = np.load(fpath)
+                                                       if images.size == 0:
+                                                           continue
                                                        prey = model.predict(images, batch_size=1)
                                                        labels = np.argmax(prey, axis=1)
                                                        c += np.sum(labels==ground)
                                                        n += np.sum(labels!=ground)
-                                                       return c, n
+
+                                                    return c, n
                                                        #if itr > name:
                                                            # print(images.shape)
                                                        #    total_images.extend(list(images))
@@ -84,13 +85,13 @@ def summaryCW(modellist =['mlp','lenet','deepxplore'], datalist = ['mnist','fash
                                                ncount += dn
                                                #total_images.append(finalimg.get('img'))
                                                #np.save(svaedpath, total_images)
-                                               break
+                                               #break
                                            else:
                                                continue
                             else:
                                     continue
 
-                            return count, ncount
+                        return count, ncount
 
 
                     dc, dn = dowork()
@@ -98,7 +99,7 @@ def summaryCW(modellist =['mlp','lenet','deepxplore'], datalist = ['mnist','fash
                     tncount += dn
 
     df = pd.DataFrame(data = {'c':tncount, 'nc': tncount})
-    df.to_csv("count.csv")
+    df.to_csv("count_%s.csv"%cfilename)
 
 def summaryFGSM(modellist =['mlp','lenet','deepxplore'], datalist = ['mnist','fashion_mnist'], adv=['FGSM']):
     #modellist =['mlp','lenet','deepxplore', 'netinnet','vgg']
@@ -138,10 +139,10 @@ def summaryFGSM(modellist =['mlp','lenet','deepxplore'], datalist = ['mnist','fa
 
                     dowork()
 if __name__ == '__main__':
-    summaryCW(modellist=['mlp'], datalist=['mnist', 'fashion_mnist'])
-    summaryCW(modellist=['lenet', 'deepxplore'], datalist=['mnist', 'fashion_mnist'])
-    summaryCW(modellist=['vgg'], datalist=['cifar10'])
-    summaryCW(modellist=['netinnet'], datalist=['cifar10'])
+    summaryCW("1", modellist=['mlp'], datalist=['mnist', 'fashion_mnist'])
+    summaryCW("2", modellist=['lenet', 'deepxplore'], datalist=['mnist','fashion_mnist'])
+    summaryCW('3', modellist=['vgg'], datalist=['cifar10'])
+    summaryCW('4', modellist=['netinnet'], datalist=['cifar10'])
 
     #summaryFGSM(modellist=['mlp'], datalist=['mnist', 'fashion_mnist'])
     #summaryFGSM(modellist=['lenet', 'deepxplore'], datalist=['mnist', 'fashion_mnist'])
