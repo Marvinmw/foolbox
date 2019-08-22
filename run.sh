@@ -2,9 +2,9 @@
 
 #SBATCH -N 1
 #SBATCH --ntasks-per-node=4
-#SBATCH --time=4-23:00:00
-#SBATCH -p bigmem
-#SBATCH --qos=qos-bigmem
+#SBATCH --time=1:00:00
+#SBATCH -p gpu
+#SBATCH --qos=qos-gpu
 #SBATCH -C skylake
 #SBATCH -J  mediate_images_cw
 #SBATCH --mail-type=end,fail
