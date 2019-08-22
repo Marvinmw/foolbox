@@ -98,7 +98,7 @@ def summaryCW(cfilename, modellist =['mlp','lenet','deepxplore'], datalist = ['m
                     tcount += dc
                     tncount += dn
 
-    df = pd.DataFrame(data = {'c':tncount, 'nc': tncount})
+    df = pd.DataFrame(data = {'c':tcount, 'nc': tncount})
     df.to_csv("count_%s.csv"%cfilename)
 
 def summaryFGSM(modellist =['mlp','lenet','deepxplore'], datalist = ['mnist','fashion_mnist'], adv=['FGSM']):
